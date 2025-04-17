@@ -1,15 +1,16 @@
 
 /**
- * Plant Dinosaur class for monster collector Style game.
+ * Making the Monster Collector Game more object oriented using the enum MonsterType for the Plant Dinosaur type
+ * instead of the default "Grass"
  *
  * Copyright 2025 Howard Community College
  *
  * @author Tiffany McCormick
- * @version 1.0
+ * @version 2.0
  */
 public class PlantDinosaur {
 
-    private final String type = "Grass";
+    private final MonsterType type = MonsterType.GRASS;
     private int maxHealth;
     private int currentHealth;
     private int attack;
@@ -55,7 +56,7 @@ public class PlantDinosaur {
         return speed;
     }
 
-    public String getType() {
+    public MonsterType getType() {
         return type;
     }
 
