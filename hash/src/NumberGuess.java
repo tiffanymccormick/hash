@@ -1,16 +1,17 @@
 
 /**
- * User is given a certain number of guesses to guess the magic number, given 
- * indivators of whether the guess is too low or too high to work towards the right number.
- * In addition, the user will be able to play the game up to the best of three games, but
- * has the option for infinite replays
+ * Number guess game, where the user guesses a magic number with indicators of "too high"
+ * and "too low" is simplified to only execute independent games, code simplified
+ * and optimized to use methods. User guess history is tracked using an ArrayList
+ * to calculate end of game statistics.
  * 
  * Copyright 2025 Howard Community College
  *
  * @author Tiffany McCormick
- * @version 3.0
+ * @version 5.0
  */
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -27,80 +28,152 @@ public class NumberGuess {
         Scanner scan = new Scanner(System.in);
         System.out.println("Copyright 2025 Howard Community College\n");
 
+        // ArrayList to track the outcome of each game (number of guesses used or -1 if unsuccessful)
+        ArrayList<Integer> outcomes = new ArrayList<Integer>();
+
         // To track whether the user wants to repeat the games or not, allowing for infinite replays
-        String repeatGame;
+        boolean repeatGame;
         
         do {
-            int totalWins = 0;  // Tracks the number of wins
+            // Generate a random magic number between 1 and 1000 (inclusive)
+            int magicNumber = random.nextInt(1000) + 1;
             
-            // For loop for three independent games
-            for (int game = 1; game <= 3; game++) {
-                System.out.println("Game " + game + " of 3:");
-                
-                // Random number between 1 and 1000 (inclusive)
-                int magicNumber = random.nextInt(1001);
-                
-                int guessesTaken = 0;
-                int guessesRemaining = MAX_GUESSES;
-                boolean guessedCorrectly = false;
-                int guess = 0;
-                
-                // User guesses until they run out of attempts or guess correctly
-                while (guessesRemaining > 0 && !guessedCorrectly) {
-                    System.out.print("Enter your guess (" + guessesRemaining 
-                               + " remaining): ");
-                    guess = scan.nextInt();
-                    scan.nextLine();
-                    
-                    guessesTaken++;
-                    
-                    if (guess < magicNumber) {
-                        System.out.println("Too low.");
-                    } else if (guess > magicNumber) {
-                        System.out.println("Too high.");
-                    } else {
-                        // Correct guess
-                        guessedCorrectly = true;
-                        String guessWord2;
-                        if (guessesTaken == 1) {
-                            guessWord2 = "guess";
-                        } else {
-                            guessWord2 = "guesses";
-                        }
-                        System.out.println("Congratulations, you guessed the magic number in " 
-                                           + guessesTaken + " " + guessWord2 + "!");
-                        totalWins++;
-                    }
-                    
-                    if (!guessedCorrectly) {
-                        guessesRemaining--;
-                    }
-                }
-                
-                // If the user didn't guess the number correctly within the allowed attempts
-                if (!guessedCorrectly) {
-                    System.out.println("Sorry, you're out of guesses. The magic number was " + magicNumber + ".");
-                }
-                System.out.println();
-            }
+            // Run one playthrough of the game and add the outcome to the outcomes ArrayList
+            int guessesUsed = runGame(scan, magicNumber, MAX_GUESSES);
+            outcomes.add(guessesUsed);
             
-            // After the best-of-three series, reports the number of wins
-            System.out.println("You won " + totalWins + " out of 3 games.");
-            
-            // Prompts the user to play again, accepting only 'Y' or 'N' (while ignoring other invalid cases)
-            System.out.print("Would you like to play again? (Y/N): ");
-            repeatGame = scan.nextLine();
-            
-            while (!repeatGame.equalsIgnoreCase("Y") && !repeatGame.equalsIgnoreCase("N")) {
-                System.out.println("Error: Please enter only Y or N.");
-                System.out.print("Would you like to play again? (Y/N): ");
-                repeatGame = scan.nextLine();
-            }
+            // Prompt to play again using getValidatedYN method
+            repeatGame = getValidatedYN(scan, "Would you like to play again? (y or n) ", "Error: Please enter Y or N");
             System.out.println();
-        } while (repeatGame.equalsIgnoreCase("Y"));
+        } while (repeatGame);
+
+        System.out.println("Game History\n-----------");
+
+        // Track the gameplay statistics to be printed when the user opts out of playing
+        int successfulGames = 0;
+        int unsuccessfulGames = 0;
+        int totalGuessesSuccessful = 0;
         
-        // If the user chooses to opt out of playing
+        // To iterate over outcomes, print each outcome and update statistics
+        for (int outcome : outcomes) {
+            if (outcome == -1) {
+                // Unsuccessful game
+                System.out.println("Unsuccessful");
+                unsuccessfulGames++;
+            } else {
+                // Successful game
+                if (outcome == 1) {
+                    System.out.println("1 guess");
+                } else {
+                    System.out.println(outcome + " guesses");
+                }
+                successfulGames++;
+                totalGuessesSuccessful += outcome;
+            }
+        }
+        
+        // Display gameplay statistics
+        System.out.println("\nStatistics\n-----------");
+        int totalGames = outcomes.size();
+        if (totalGames == 1) {
+            System.out.println("You played 1 game.");
+        } else {
+            System.out.println("You played " + totalGames + " games.");
+        }
+        
+        if (unsuccessfulGames == 1) {
+            System.out.println("1 was unsuccessful.");
+        } else {
+            System.out.println(unsuccessfulGames + " were unsuccessful.");
+        }
+        
+        if (successfulGames == 1) {
+            System.out.println("1 was successful.");
+        } else {
+            System.out.println(successfulGames + " were successful.");
+        }
+        
+        if (successfulGames > 0) {
+            double average = (double) totalGuessesSuccessful / successfulGames;
+            System.out.printf("%.2f average guesses per successful game.%n", average);
+        }
+        
         System.out.println("Thanks for playing!");
         scan.close();
     }
+
+     /**
+     * Prompts the user for a Y/N response to ask whether they want to keep playing, then validates the input, and returns true if Y,
+     * false if N.
+     *
+     * @param input is the Scanner object for input
+     * @param prompt is the message to prompt the user
+     * @param errorMessage is the error message to display for invalid input
+     * @return true if the user enters 'Y', false if 'N', not case sensitive
+     */
+    private static boolean getValidatedYN(Scanner input, String prompt, String errorMessage) {
+        System.out.print(prompt);
+        String response = input.nextLine();
+        while (!response.equalsIgnoreCase("Y") && !response.equalsIgnoreCase("N")) {
+            System.out.println(errorMessage);
+            System.out.print(prompt);
+            response = input.nextLine();
+        }
+        return response.equalsIgnoreCase("Y");
+    }
+    
+    /**
+     * Runs one playthrough of the number guess game. The user has a maximum number of 
+     * guesses in order to guess the magic number. 
+     * If the user guesses correctly, the method returns the number
+     * of guesses taken; otherwise, it returns -1
+     *
+     * @param input is the Scanner object for input
+     * @param magicNumber is the magic number to be guessed
+     * @param maxGuesses is the maximum number of allowed guesses
+     * @return the number of guesses taken if successful; -1 if unsuccessful
+     */
+    private static int runGame(Scanner input, int magicNumber, int maxGuesses) {
+        int guessesTaken = 0;
+        int guessesRemaining = maxGuesses;
+        boolean guessedCorrectly = false;
+        int guess = 0;
+        
+        while (guessesRemaining > 0 && !guessedCorrectly) {
+            System.out.print("Enter your guess (" + guessesRemaining + " remaining): ");
+            guess = input.nextInt();
+            input.nextLine(); 
+            
+            guessesTaken++;
+            
+            if (guess < magicNumber) {
+                System.out.println("Too low.");
+            } else if (guess > magicNumber) {
+                System.out.println("Too high.");
+            } else {
+                guessedCorrectly = true;
+                String guessWord;
+                if (guessesTaken == 1) {
+                    guessWord = "guess";
+                } else {
+                    guessWord = "guesses";
+                }
+                System.out.println("Congratulations, you guessed the number in " 
+                                   + guessesTaken + " " + guessWord + "!");
+            }
+            
+            if (!guessedCorrectly) {
+                guessesRemaining--;
+            }
+        }
+        
+        if (guessedCorrectly) {
+            return guessesTaken;
+        } else {
+            System.out.println("You are out of guesses. The magic number was " + magicNumber + ".");
+            return -1;
+        }
+    }
+
+    
 }
