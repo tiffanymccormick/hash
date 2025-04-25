@@ -6,7 +6,7 @@
  * Copyright 2025 Howard Community College
  *
  * @author Tiffany McCormick
- * @version 1.0
+ * @version 2.0
  */
 
 import java.util.*;
@@ -86,7 +86,7 @@ public class Trainer {
                 ", battlesWon=" + battlesWon +
                 ", money=" + money +
                 ", team=" + team +
-                ", activeMonsterIndex=" + activeMonsterIndex +
+                ", activeMonster=" + team.get(activeMonsterIndex) +
                 ']';
     }
 }

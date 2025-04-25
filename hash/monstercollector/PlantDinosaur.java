@@ -85,7 +85,7 @@ public class PlantDinosaur {
     @Override
     public String toString() {
         return "PlantDinosaur [" +
-                "type='" + type + '\'' +
+                "type='" + type.getReadable() + '\'' +
                 ", maxHealth=" + maxHealth +
                 ", currentHealth=" + currentHealth +
                 ", attack=" + attack +

@@ -9,7 +9,7 @@
 
 import java.util.*;
 public class TrainerTest {
-    public static void main(String args){
+    public static void main(String[] args){
         // Testing 3 argument constructor named Blue with 50.0 money and 
         Trainer blue = new Trainer("Blue", 50.0, "Charmander");
         blue.getTeam().add("Squirtle");
@@ -24,13 +24,13 @@ public class TrainerTest {
         System.out.println(red);
 
         // User inputs new monster to be added to Blue's team
-        System.out.println("Select monster to be active");
+        System.out.println("\nSelect monster to be active");
         Scanner input = new Scanner(System.in);
         
         // Iterates through the current monsters in Blue's team and prints them out
         List<String> team = blue.getTeam();
         for (int i = 0; i < team.size(); i++) {
-            System.out.println(i + ". " + team.get(i));
+            System.out.println(i+1 + ". " + team.get(i));
         }
 
         // User chooses what monster to be active
@@ -39,11 +39,11 @@ public class TrainerTest {
         blue.setActiveMonsterIndex(choice);
 
         // Print out updated blue team
-        System.out.println(blue);
+        System.out.println("\n"+ blue);
 
         // Test updated Plant Dinosaur
         PlantDinosaur dino = new PlantDinosaur();
-        System.out.println(dino);
+        System.out.println("\n"+ dino);
     }
 
     /**

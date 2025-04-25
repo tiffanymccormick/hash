@@ -9,8 +9,7 @@
  */
 public enum MonsterType {
     GRASS("Grass"),
-    WOOD("Wood"),
-    PLASTIC("Plastic"),
+    FIRE("Fire"),
     WATER("Water"),
     FIGHTING("Fighting"),
     STEEL("Steel"),
